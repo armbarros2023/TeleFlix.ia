@@ -2,14 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
+import routes from './routes.js';
+
+import './database/index.js';
+
 const app = express();
 
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    return res.json({ message: 'Hello World' });
-});
+app.use(routes);
 
 export default app;

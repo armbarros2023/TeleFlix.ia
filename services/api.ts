@@ -5,16 +5,46 @@ import { db } from './mockDb';
 // em vez de fazer chamadas de rede para um backend.
 // Isso resolve os erros "Failed to fetch" e permite que o aplicativo funcione de forma independente.
 
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const simulateApiCall = <T>(data: T, delay = 200): Promise<T> => {
-  return new Promise(resolve => setTimeout(() => resolve(data), delay));
+    return new Promise(resolve => setTimeout(() => resolve(data), delay));
 };
 
-const login = async (username?: string, password?: string): Promise<User> => {
-    const { user, error } = db.findUserByCredentials(username, password);
-    if (error) {
-        throw new Error(error);
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'API Request Failed');
     }
-    return simulateApiCall(user!);
+
+    return response.json();
+}
+
+const login = async (username?: string, password?: string): Promise<User> => {
+    if (USE_MOCK) {
+        const { user, error } = db.findUserByCredentials(username, password);
+        if (error) {
+            throw new Error(error);
+        }
+        return simulateApiCall(user!);
+    }
+
+    const response = await apiRequest<{ user: User; token: string }>('/sessions', {
+        method: 'POST',
+        body: JSON.stringify({ email: username, password }),
+    });
+
+    localStorage.setItem('token', response.token);
+    return response.user;
 };
 
 const getServiceOrders = async (): Promise<ServiceOrder[]> => {
@@ -38,7 +68,7 @@ const getClients = async (): Promise<Client[]> => {
 };
 
 const addClient = async (client: Omit<Client, 'id'>): Promise<Client> => {
-     return simulateApiCall(db.addClient(client));
+    return simulateApiCall(db.addClient(client));
 };
 
 const getUsers = async (): Promise<User[]> => {
