@@ -37,7 +37,7 @@ const Login: React.FC = () => {
     setError(null);
     try {
       // Simulate login with the admin user for demo purposes
-      await login('administrador', '112233');
+      await login('admin@teleflix.com.br', '123456');
       navigate('/dashboard');
     } catch (err) {
       setError((err as Error).message || 'Falha no login com Google.');
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="ex: administrador"
+                  placeholder="ex: admin@teleflix.com.br"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="ex: 112233"
+                  placeholder="ex: 123456"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -121,7 +121,7 @@ const Login: React.FC = () => {
           </Button>
         </CardContent>
         <CardFooter className="flex-col gap-4">
-          <p className="text-xs text-muted-foreground text-center w-full">Para teste, use usuário `administrador` e senha `112233`.</p>
+          <p className="text-xs text-muted-foreground text-center w-full">Para teste, use usuário `admin@teleflix.com.br` e senha `123456`.</p>
         </CardFooter>
       </Card>
       <div className="mt-8 text-center">
@@ -129,8 +129,8 @@ const Login: React.FC = () => {
           variant="ghost"
           className="text-white/50 hover:text-white hover:bg-white/10"
           onClick={() => {
-            setUsername('administrador');
-            setPassword('112233');
+            setUsername('admin@teleflix.com.br');
+            setPassword('123456');
             // Optional: Auto-submit
             // setTimeout(() => document.querySelector('form')?.requestSubmit(), 100);
           }}
